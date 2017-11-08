@@ -161,6 +161,24 @@ void ApplicationSolar::upload_orbits(planet const& p) const
 }
 
 
+void ApplicationSolar::upload_orbits(satellite const& p) const
+{
+  float dist = p.m_dis_to_father;
+  //stretches the Circles to the distance of each planets.
+  glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()*p.m_father.m_rot_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
+  model_matrix = glm::translate(model_matrix, glm::fvec3{0.0f, 0.0f, -p.m_father.m_dis_to_origin});
+
+  //stretches it around the father planet
+  model_matrix = glm::scale(model_matrix, glm::fvec3{dist, 0, dist});
+
+  glUseProgram(m_shaders.at("orbit").handle);
+  glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"), 1, GL_FALSE, glm::value_ptr(model_matrix));
+
+  glBindVertexArray(orbit_object.vertex_AO);
+  glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
+}
+
+
 void ApplicationSolar::render() const {
   for (unsigned int i = 0; i < all_planets.size(); i++){
     upload_planet_transforms(all_planets[i]);
@@ -169,6 +187,7 @@ void ApplicationSolar::render() const {
 
   for (unsigned int i = 0; i < all_satellites.size(); i++){
     upload_planet_transforms(all_satellites[i]);
+    upload_orbits(all_satellites[i]);
   }
   upload_stars();
 }

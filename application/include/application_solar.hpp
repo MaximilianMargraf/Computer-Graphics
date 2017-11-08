@@ -41,6 +41,7 @@ class ApplicationSolar : public Application {
   void upload_planet_transforms(satellite const& p) const;
   void upload_stars() const;
   void upload_orbits(planet const& p) const;
+  void upload_orbits(satellite const& p) const;
 
   // calls upload_planet_transforms funct. for all planets/satellites
   void render() const;
