@@ -43,18 +43,16 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   }
 
   //Init points in cycle 
-  for(int i = 0; i <= 359; i++)
+  for(int i = 0; i <= 360; i++)
   {
-    if(cos((i*M_PI)/180) && sin((i*M_PI)/180) != 0){
     all_orbits.push_back(cos((i*M_PI)/180));
     all_orbits.push_back(0.0f);
-    all_orbits.push_back(sin((i*M_PI)/180));}
+    all_orbits.push_back(sin((i*M_PI)/180));
   }
-  
-
-  initializeGeometry();
-  initializeStars();
   initializeOrbits();
+  initializeGeometry();
+   initializeStars();
+
   initializeShaderPrograms();
  
    //initializes our planets and satellites
@@ -165,13 +163,13 @@ void ApplicationSolar::upload_orbits(planet const& p) const
 {
   float dist = p.m_dis_to_origin;
   //Transform model matrix
-  glm::fmat4 model_matrix = glm::scale(glm::fmat4{}, glm::fvec3{dist, dist, dist});
+  glm::fmat4 model_matrix = glm::scale(glm::fmat4{}, glm::fvec3{dist, 0, dist});
 
   glUseProgram(m_shaders.at("orbit").handle);
   glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"), 1, GL_FALSE, glm::value_ptr(model_matrix));
 
   glBindVertexArray(orbit_object.vertex_AO);
-  glDrawArrays(orbit_object.draw_mode, 0, (int)all_orbits.size());
+  glDrawArrays(orbit_object.draw_mode, NULL, orbit_object.num_elements);
 }
 
 void ApplicationSolar::render() const {
@@ -347,9 +345,11 @@ void ApplicationSolar::initializeGeometry() {
 }
 
 // load stars
-void ApplicationSolar::initializeStars(){//+++++++++++++++++STARS+++++++++++++++++++++++++++++++++
+void ApplicationSolar::initializeStars(){
+//+++++++++++++++++STARS+++++++++++++++++++++++++++++++++
 
   model star_model = {all_stars, model::POSITION | model::NORMAL};
+  
   // generate vertex array object
   glGenVertexArrays(1, &star_object.vertex_AO);
   // bind the array for attaching buffers
@@ -387,41 +387,10 @@ void ApplicationSolar::initializeStars(){//+++++++++++++++++STARS+++++++++++++++
 
 
 // load Orbits
-void ApplicationSolar::initializeOrbits()
-{/*
-  model orbit_model = {all_orbits, model::POSITION,1};
-  // generate vertex array object
-  glGenVertexArrays(1, &orbit_object.vertex_AO);
-  // bind the array for attaching buffers
-  glBindVertexArray(orbit_object.vertex_AO);
-  // generate generic buffer
-  glGenBuffers(1, &orbit_object.vertex_BO);// DAS HIER SELBEER MACHEN
-  // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ARRAY_BUFFER, orbit_object.vertex_BO);
-  // configure currently bound array buffer -> We can use size of container, because we don't have spheres
-  printf("%d", all_orbits.size());
-  glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float) * all_orbits.size(), all_orbits.data(), GL_STATIC_DRAW);
+void ApplicationSolar::initializeOrbits(){
+//+++++++++++++++++ORBITS+++++++++++++++++++++++++++++++++
 
-   // activate first attribute on gpu
-  glEnableVertexAttribArray(0);
-  // first attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, orbit_model.vertex_bytes, orbit_model.offsets[model::POSITION]);
-  // activate second attribute on gpu
-
-
-   // generate generic buffer
-  glGenBuffers(1, &orbit_object.element_BO);
-  // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orbit_object.element_BO);
-  // configure currently bound array buffer
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * sizeof(float), all_orbits.data(), GL_STATIC_DRAW);
-
-  // store type of primitive to draw
-  orbit_object.draw_mode = GL_LOOP_LINE;
-  // transfer number of indices to model object 
-  orbit_object.num_elements = GLsizei(all_orbits.size());
-*/
-  model orbit_model = {all_orbits, model::POSITION, {1}};
+  model orbit_model = model{all_orbits, model::POSITION, {1}};
 
   printf("%d", all_orbits.size());
   // generate vertex array object
@@ -434,7 +403,7 @@ void ApplicationSolar::initializeOrbits()
   glBindBuffer(GL_ARRAY_BUFFER, orbit_object.vertex_BO);
   // configure currently bound array buffer -> We can use size of container, because we don't have spheres
   printf("%d", all_orbits.size());
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * all_orbits.size(), all_orbits.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(double) * all_orbits.size(), all_orbits.data(), GL_STATIC_DRAW);
 
   // activate first attribute on gpu
   glEnableVertexAttribArray(0);
@@ -444,13 +413,11 @@ void ApplicationSolar::initializeOrbits()
   // store type of primitive to draw
   orbit_object.draw_mode = GL_LINE_LOOP;
   //transfer number of indices to model object 
-  orbit_object.num_elements = GLsizei(all_orbits.size());
-
-  //glBindVertexArray(0); //vielleicht
+  orbit_object.num_elements = GLsizei(all_orbits.size()/3);
 }
 
 
-ApplicationSolar::~ApplicationSolar() {
+ApplicationSolar::~ApplicationSolar(){
   glDeleteBuffers(1, &planet_object.vertex_BO);
   glDeleteBuffers(1, &planet_object.element_BO);
   glDeleteVertexArrays(1, &planet_object.vertex_AO);
