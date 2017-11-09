@@ -55,6 +55,7 @@ class ApplicationSolar : public Application {
   void fillOrbits();
   void fillStars();
   void fillPlanets();
+  
 
   // cpu representation of model
   model_object planet_object;

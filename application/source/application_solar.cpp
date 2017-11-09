@@ -19,6 +19,7 @@ using namespace gl;
 
 #include <iostream>
 #include <stdio.h>
+#include <cmath>
 
 
 
@@ -38,13 +39,124 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 }
 
 
-//fills the Orbit Vector with unit circles
-void ApplicationSolar::fillStars(){
-  for (int i = 0; i < 6000; i++){ 
-    if (i % 6 < 3){ //rand values for position
-      all_stars.insert(std::end(all_stars), -100  + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/200)));
+//Fill Stars vector with floats. This only happens once, so i guess all the if-cases are okay
+void ApplicationSolar::fillStars()
+{
+  for (int i = 0; i < 100000; i++)
+  { 
+    //Random Values for Stars
+    if (i % 4 == 0)
+    {
+      //Its a box, not a bubble, but meh. its oke
+      float x = -1000  + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/2000)); 
+      float y = -1000  + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/2000));
+      float z = -1000  + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/2000));
+      float euclid = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+      float min_dis_to_sun = 800;
+
+      //Check if euclidean distance of star is bigger than 60.
+      if(euclid > min_dis_to_sun)
+      {
+        all_stars.insert(std::end(all_stars), x);
+        all_stars.insert(std::end(all_stars), y);
+        all_stars.insert(std::end(all_stars), z);
+      }
+
+      else
+      {
+        if(y >= 0 && x >= 0 && z >= 0)
+        {
+          x += min_dis_to_sun - euclid;
+          y += min_dis_to_sun - euclid;
+          z += min_dis_to_sun - euclid;
+
+          all_stars.insert(std::end(all_stars), x);
+          all_stars.insert(std::end(all_stars), y);
+          all_stars.insert(std::end(all_stars), z);
+        }
+
+        else if(y < 0 && x >= 0 && z >= 0)
+        {
+          x += min_dis_to_sun - euclid;
+          y -= min_dis_to_sun - euclid;
+          z += min_dis_to_sun - euclid;
+
+          all_stars.insert(std::end(all_stars), x);
+          all_stars.insert(std::end(all_stars), y);
+          all_stars.insert(std::end(all_stars), z);
+        }
+
+        else if(y >= 0 && x < 0 && z >= 0)
+        {
+          x -= min_dis_to_sun - euclid;
+          y += min_dis_to_sun - euclid;
+          z += min_dis_to_sun - euclid;
+
+          all_stars.insert(std::end(all_stars), x);
+          all_stars.insert(std::end(all_stars), y);
+          all_stars.insert(std::end(all_stars), z);
+        }
+
+        else if(y >= 0 && x >= 0 && z < 0)
+        {
+          x += min_dis_to_sun - euclid;
+          y += min_dis_to_sun - euclid;
+          z -= min_dis_to_sun - euclid;
+
+          all_stars.insert(std::end(all_stars), x);
+          all_stars.insert(std::end(all_stars), y);
+          all_stars.insert(std::end(all_stars), z);
+        }
+
+        else if(y < 0 && x < 0 && z >= 0)
+        {
+          x -= min_dis_to_sun - euclid;
+          y -= min_dis_to_sun - euclid;
+          z += min_dis_to_sun - euclid;
+
+          all_stars.insert(std::end(all_stars), x);
+          all_stars.insert(std::end(all_stars), y);
+          all_stars.insert(std::end(all_stars), z);
+        }
+
+        else if(y < 0 && x >= 0 && z < 0)
+        {
+          x += min_dis_to_sun - euclid;
+          y -= min_dis_to_sun - euclid;
+          z -= min_dis_to_sun - euclid;
+
+          all_stars.insert(std::end(all_stars), x);
+          all_stars.insert(std::end(all_stars), y);
+          all_stars.insert(std::end(all_stars), z);
+        }
+
+        else if(y >= 0 && x < 0 && z < 0)
+        {
+          x -= min_dis_to_sun - euclid;
+          y += min_dis_to_sun - euclid;
+          z -= min_dis_to_sun - euclid;
+
+          all_stars.insert(std::end(all_stars), x);
+          all_stars.insert(std::end(all_stars), y);
+          all_stars.insert(std::end(all_stars), z);
+        }
+
+        else
+        {
+        x -= min_dis_to_sun - euclid;
+        y -= min_dis_to_sun - euclid;
+        z -= min_dis_to_sun - euclid;  
+
+        all_stars.insert(std::end(all_stars), x);
+        all_stars.insert(std::end(all_stars), y);
+        all_stars.insert(std::end(all_stars), z);
+        }
+      }    
     }
-    else{ //Color values
+
+    //3 Colour Values
+    else
+    {
       all_stars.insert(std::end(all_stars), static_cast <float> (rand()) / static_cast <float> (RAND_MAX));    
     }
   }
@@ -64,17 +176,17 @@ void ApplicationSolar::fillOrbits(){
 
 //initializes our planets and satellites
 void ApplicationSolar::fillPlanets(){
-  planet sonne(7.0f, 0.0f, 0.0f);
-  planet merkur(0.9f, 0.48f, 10.0f);
-  planet venus(2.0f, 0.35f, 15.0f);
-  planet erde(2.0f, 0.30f, 20.0f);
-  satellite mond(erde, 0.5f, 0.5f, 3.0f);
-  planet mars(0.9f, 0.24f, 25.0f);
-  planet jupiter(5.0f, 0.13f, 33.0f);
-  planet saturn(3.5f, 0.1f, 41.0f);
-  planet uranus(3.7f, 0.07f, 50.0f);
-  planet neptun(3.4f, 0.05f, 57.0f);
-  planet pluto(0.5f, 3.6f, 62.0f);
+  planet sonne(10.0f, 0.0f, 0.0f);
+  planet merkur(0.6f, 0.48f, 15.0f);
+  planet venus(2.5f, 0.35f, 22.0f);
+  planet erde(2.5f, 0.30f, 28.0f);
+  satellite mond(erde, 0.2f, 0.5f, 3.2f);
+  planet mars(0.6f, 0.24f, 35.0f);
+  planet jupiter(4.0f, 0.13f, 45.0f);
+  planet saturn(3.0f, 0.1f, 55.0f);
+  planet uranus(3.2f, 0.07f, 65.0f);
+  planet neptun(2.9f, 0.05f, 75.0f);
+  //planet pluto(0.5f, 3.6f, 62.0f);
 
   all_planets.insert(std::end(all_planets), {sonne, erde, merkur, venus, mars,
     jupiter,saturn, uranus, neptun});
@@ -142,7 +254,7 @@ void ApplicationSolar::upload_planet_transforms(planet const& p) const{
 void ApplicationSolar::upload_stars() const {
   glUseProgram(m_shaders.at("star").handle);
   glBindVertexArray(star_object.vertex_AO);
-  glPointSize(3);
+  glPointSize(1);
   glDrawArrays(star_object.draw_mode, 0, (int)all_stars.size());
 }
 
@@ -275,9 +387,11 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods){
 }
 
 //handle delta mouse movement input
-void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
-  m_view_transform = glm::rotate(m_view_transform, (float)pos_x/100, glm::fvec3(0.0f, -1.0f, 0.0f));
+void ApplicationSolar::mouseCallback(double pos_x, double pos_y)
+{
   m_view_transform = glm::rotate(m_view_transform, (float)pos_y/100, glm::fvec3(-1.0f, 0.0f, 0.0f));
+  m_view_transform = glm::rotate(m_view_transform, (float)pos_x/100, glm::fvec3(0.0f, -1.0f, 0.0f));
+
   updateView();
 }
 
@@ -376,7 +490,7 @@ void ApplicationSolar::initializeStars(){
   // activate first attribute on gpu
   glEnableVertexAttribArray(0);
   // first attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float),(void*)0); //Compiler sagt void, keine ahnung, was das genau heisst.
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float),(void*)0);
   // activate second attribute on gpu
   glEnableVertexAttribArray(1);
   // second attribute is 3 floats with no offset & stride
