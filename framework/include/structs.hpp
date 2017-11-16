@@ -74,25 +74,4 @@ struct satellite {
   float m_dis_to_father;
 };
 
-/* 
-struct star{
-  star():
-  position{rand_coord(), rand_coord(), rand_coord()},
-  color{rand_col(), rand_col(), rand_col()}
-  {}
-
-  glm::vec3 position;
-  glm::vec3 color;
-
-  float rand_coord(){
-    float r = -50 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/100));
-    return r;
-  }
-
-  float rand_col(){
-    float r = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/255));
-    return r;
-  }
-};
-*/
 #endif
