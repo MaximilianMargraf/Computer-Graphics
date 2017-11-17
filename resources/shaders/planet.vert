@@ -10,18 +10,16 @@ uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform mat4 NormalMatrix;
-uniform vec3 SunPosition;
 
-out vec3 pass_Normal;
-out vec4 sunPosition;
-//out vec4 gl_Position;
+out vec3 pass_WorldNormal;
+out vec3 pass_vertPos;
 
 void main(void)
 {
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
+	vec4 vertPos4 = ModelMatrix * vec4(in_Position, 1.0);
+	pass_vertPos = vec3(vertPos4).xyz / vertPos4.w;
 
-	//Sun position depending on ViewMatrix
-	sunPosition = (-ViewMatrix * vec4(0.0, 0.0, 0.0, 1.0));
-
-	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
+	//In Worlspace
+	pass_WorldNormal = (ModelMatrix * vec4(in_Normal, 0.0)).xyz;
 }
