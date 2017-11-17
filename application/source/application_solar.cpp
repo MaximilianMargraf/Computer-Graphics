@@ -429,16 +429,16 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods)
   }
 
   //Bill-Phong Shading
-  else if (key == GLFW_KEY_1)
+  /*else if (key == GLFW_KEY_1)
   {
-
+    glUniformli(m_shaders.at("planet").u_locs.at("ModelMatrix"), 1);
   }
 
-  //cel shading
+  //Cel shading
   else if (key == GLFW_KEY_2)
   {
-
-  }
+    glUniformli(m_shaders.at("planet").u_locs.at("ModelMatrix"), 2);
+  }*/
 
 }
 
